@@ -56,6 +56,20 @@ impl Block {
     }
 }
 
+struct Ball {
+    rect: Rect,
+    vel: Vec2,
+}
+
+impl Ball {
+    pub fn new(pos: Vec2) -> Self {
+        Self {
+            rect: Rect::new(pos.x, pos.y, 10f32, 10f32),
+            vel: const_vec2!([0f32, 0f32]),
+        }
+    }
+}
+
 #[macroquad::main("breakout")]
 async fn main() {
     let mut player = Player::new();
