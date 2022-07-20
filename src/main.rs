@@ -121,16 +121,18 @@ async fn main() {
     let font = load_ttf_font("res/poppins.ttf").await.unwrap();
     let mut score = 0;
     let mut player = Player::new();
+    let mut player_lives = 3;
     let mut blocks = Vec::new();
     let mut balls = Vec::new();
-
     let (width, height) = (6, 6);
     let padding = 5f32;
     let total_block_size = BLOCK_SIZE + vec2(padding, padding);
+
     let board_start_pos = vec2(
         (screen_width() - (total_block_size.x * width as f32)) * 0.5f32,
         50f32,
     );
+
     for i in 0..width * height {
         let block_x = (i % width) as f32 * total_block_size.x;
         let block_y = (i / width) as f32 * total_block_size.y;
@@ -159,10 +161,14 @@ async fn main() {
             for block in blocks.iter_mut() {
                 if resolve_collision(&mut ball.rect, &mut ball.vel, &mut block.rect) {
                     block.lives -= 1;
-                    score += 10;
+                    if block.lives <= 0 {
+                        score += 10;
+                    }
                 }
             }
         }
+
+        balls.retain(|ball| ball.rect.y < screen_height() - 100f32);
 
         blocks.retain(|block| block.lives > 0);
 
@@ -183,6 +189,18 @@ async fn main() {
         draw_text_ex(
             &format!("score: {}", score),
             screen_width() * 0.5f32 - score_text_dim.width * 0.5f32,
+            40.0,
+            TextParams {
+                font,
+                font_size: 30u16,
+                color: BLACK,
+                ..Default::default()
+            },
+        );
+
+        draw_text_ex(
+            &format!("lives {}", player_lives),
+            30.0,
             40.0,
             TextParams {
                 font,
